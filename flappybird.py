@@ -5,23 +5,23 @@ import random
 TELA_LARGURA = 500
 TELA_ALTURA = 800
 
-IMAGEM_CANO = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'pipe.png')))
+IMAGEM_KPT = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'kpta.png')))
 IMAGEM_CHAO = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'base.png')))
 IMAGEM_BACKGROUND = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bg.png')))
-IMAGENS_PASSARO = [
-    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))),
-    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))),
-    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))), 
+IMAGENS_SUPERMEN = [
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'superhomem.png'))),
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'superhomem.png'))),
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'superhomem.png'))), 
 ]
  
 pygame.font.init()
-FONTE_PONTOS = pygame.font.SysFont('arial', 50) 
+FONTE_PONTOS = pygame.font.SysFont('',50) 
 
 
-class Passaro:
-    IMGS = IMAGENS_PASSARO 
+class Supermen:
+    IMGS = IMAGENS_SUPERMEN 
     # animações da rotação
-    ROTACAO_MAXIMA = 25
+    ROTACAO_MAXIMA = 40
     VELOCIDADE_ROTACAO = 20
     TEMPO_ANIMACAO = 5
 
@@ -53,7 +53,7 @@ class Passaro:
 
         self.y += deslocamento
 
-        # o angulo do passaro
+        # o angulo do supermen
         if deslocamento < 0 or self.y < (self.altura + 50):
             if self.angulo < self.ROTACAO_MAXIMA:
                 self.angulo = self.ROTACAO_MAXIMA
@@ -62,7 +62,7 @@ class Passaro:
                 self.angulo -= self.VELOCIDADE_ROTACAO
 
     def desenhar(self, tela):
-        # definir qual imagem do passaro vai usar
+        # definir qual imagem do supermen vai usar
         self.contagem_imagem += 1
 
         if self.contagem_imagem < self.TEMPO_ANIMACAO:
@@ -78,7 +78,7 @@ class Passaro:
             self.contagem_imagem = 0
 
 
-        # se o passaro tiver caindo eu não vou bater asa
+        # se o supermen tiver caindo eu não vou bater asa
         if self.angulo <= -80:
             self.imagem = self.IMGS[1]
             self.contagem_imagem = self.TEMPO_ANIMACAO*2
@@ -92,9 +92,8 @@ class Passaro:
     def get_mask(self):
         return pygame.mask.from_surface(self.imagem)
 
-
-class Cano:
-    DISTANCIA = 200
+class Kriptonita:
+    DISTANCIA = 180
     VELOCIDADE = 5
 
     def __init__(self, x):
@@ -102,33 +101,33 @@ class Cano:
         self.altura = 0
         self.pos_topo = 0
         self.pos_base = 0
-        self.CANO_TOPO = pygame.transform.flip(IMAGEM_CANO, False, True)
-        self.CANO_BASE = IMAGEM_CANO
+        self.KPT_TOPO = pygame.transform.flip(IMAGEM_KPT, False, True)
+        self.KPT_BASE = IMAGEM_KPT
         self.passou = False
         self.definir_altura()
 
     def definir_altura(self):
         self.altura = random.randrange(50, 450)
-        self.pos_topo = self.altura - self.CANO_TOPO.get_height()
-        self.pos_base = self.altura + self.DISTANCIA
+        self.pos_topo = self.altura - self.KPT_TOPO.get_height()
+        self.pos_base = self.altura + self.DISTANCIA   
 
     def mover(self):
         self.x -= self.VELOCIDADE
 
     def desenhar(self, tela):
-        tela.blit(self.CANO_TOPO, (self.x, self.pos_topo))
-        tela.blit(self.CANO_BASE, (self.x, self.pos_base))
+        tela.blit(self.KPT_TOPO, (self.x, self.pos_topo))
+        tela.blit(self.KPT_BASE, (self.x, self.pos_base))
 
-    def colidir(self, passaro):
-        passaro_mask = passaro.get_mask()
-        topo_mask = pygame.mask.from_surface(self.CANO_TOPO)
-        base_mask = pygame.mask.from_surface(self.CANO_BASE)
+    def colidir(self, supermen):
+        supermen_mask = supermen.get_mask()
+        topo_mask = pygame.mask.from_surface(self.KPT_TOPO)
+        base_mask = pygame.mask.from_surface(self.KPT_BASE)
 
-        distancia_topo = (self.x - passaro.x, self.pos_topo - round(passaro.y))
-        distancia_base = (self.x - passaro.x, self.pos_base - round(passaro.y))
+        distancia_topo = (self.x - supermen.x, self.pos_topo - round(supermen.y))
+        distancia_base = (self.x - supermen.x, self.pos_base - round(supermen.y))
 
-        topo_ponto = passaro_mask.overlap(topo_mask, distancia_topo)
-        base_ponto = passaro_mask.overlap(base_mask, distancia_base)
+        topo_ponto = supermen_mask.overlap(topo_mask, distancia_topo)
+        base_ponto = supermen_mask.overlap(base_mask, distancia_base)
 
         if base_ponto or topo_ponto:
             return True
@@ -160,23 +159,23 @@ class Chao:
         tela.blit(self.IMAGEM, (self.x2, self.y))
 
 
-def desenhar_tela(tela, passaros, canos, chao, pontos):
+def desenhar_tela(tela, supermens, kriptonitas, chao, pontos):
     tela.blit(IMAGEM_BACKGROUND, (0, 0))
-    for passaro in passaros:
-        passaro.desenhar(tela)
-    for cano in canos:
-        cano.desenhar(tela)
+    for supermen in supermens:
+        supermen.desenhar(tela)
+    for kriptonita in kriptonitas:
+        kriptonita.desenhar(tela)
 
-    texto = FONTE_PONTOS.render(f"Pontuação: {pontos}", 1, (255, 255, 255))
+    texto = FONTE_PONTOS.render(f"Pontos: {pontos}", 1, (20, 20, 20))
     tela.blit(texto, (TELA_LARGURA - 10 - texto.get_width(), 10))
     chao.desenhar(tela)
     pygame.display.update()
 
 
 def main():
-    passaros = [Passaro(230, 350)]
+    supermens = [Supermen(230, 350)]
     chao = Chao(730)
-    canos = [Cano(700)]
+    kriptonitas = [Kriptonita(700)]
     tela = pygame.display.set_mode((TELA_LARGURA, TELA_ALTURA))
     pontos = 0
     relogio = pygame.time.Clock()
@@ -193,38 +192,38 @@ def main():
                 quit()
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_SPACE:
-                    for passaro in passaros:
-                        passaro.pular()
+                    for supermen in supermens:
+                        supermen.pular()
 
         # mover as coisas
-        for passaro in passaros:
-            passaro.mover()
+        for supermen in supermens:
+            supermen.mover()
         chao.mover()
 
-        adicionar_cano = False
-        remover_canos = []
-        for cano in canos:
-            for i, passaro in enumerate(passaros):
-                if cano.colidir(passaro):
-                    passaros.pop(i)
-                if not cano.passou and passaro.x > cano.x:
-                    cano.passou = True
-                    adicionar_cano = True
-            cano.mover()
-            if cano.x + cano.CANO_TOPO.get_width() < 0:
-                remover_canos.append(cano)
+        adicionar_kriptonita = False
+        remover_kriptonitas = []
+        for kriptonita in kriptonitas:
+            for i, supermen in enumerate(supermens):
+                if kriptonita.colidir(supermen):
+                    supermens.pop(i)
+                if not kriptonita.passou and supermen.x > kriptonita.x:
+                    kriptonita.passou = True
+                    adicionar_kriptonita = True
+            kriptonita.mover()
+            if kriptonita.x + kriptonita.KPT_TOPO.get_width() < 0:
+                remover_kriptonitas.append(kriptonita)
 
-        if adicionar_cano:
+        if adicionar_kriptonita:
             pontos += 1
-            canos.append(Cano(600))
-        for cano in remover_canos:
-            canos.remove(cano)
+            kriptonitas.append(Kriptonita(600))
+        for kriptonita in remover_kriptonitas:
+            kriptonitas.remove(kriptonita)
 
-        for i, passaro in enumerate(passaros):
-            if (passaro.y + passaro.imagem.get_height()) > chao.y or passaro.y < 0:
-                passaros.pop(i)
+        for i, supermen in enumerate(supermens):
+            if (supermen.y + supermen.imagem.get_height()) > chao.y or supermen.y < 0:
+                supermens.pop(i)
 
-        desenhar_tela(tela, passaros, canos, chao, pontos)
+        desenhar_tela(tela, supermens, kriptonitas, chao, pontos)
 
 
 if __name__ == '__main__':
